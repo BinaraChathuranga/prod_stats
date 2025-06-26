@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Live Google Chart from Google Sheet</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        const queryString = encodeURIComponent('SELECT A, B');
+        const sheetID = '1lGIwUKCLgQEUHMEIBoe1uS0sA2KCBcGgTtRAYKWe1eU';
+        const dataSourceUrl = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Lab_Customers&tq=${queryString}`;
+
+        const query = new google.visualization.Query(dataSourceUrl);
+        query.send(handleQueryResponse);
+      }
+
+      function handleQueryResponse(response) {
+        if (response.isError()) {
+          alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+          return;
+        }
+
+        const data = response.getDataTable();
+        const options = {
+          title: 'Live Chart from Google Sheet',
+          hAxis: { title: data.getColumnLabel(0) },
+          vAxis: { title: data.getColumnLabel(1) },
+          legend: 'none'
+        };
+
+        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Google Sheet Chart Example</h2>
+    <div id="chart_div" style="width: 700px; height: 400px;"></div>
+  </body>
+</html>
